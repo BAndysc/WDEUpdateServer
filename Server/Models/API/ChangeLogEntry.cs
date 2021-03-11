@@ -1,6 +1,6 @@
 using System;
 
-namespace Server.Models
+namespace Server.Models.API
 {
     public class ChangeLogEntry
     {

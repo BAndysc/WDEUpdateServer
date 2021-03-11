@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server.Helpers;
-using Server.Models;
+using Server.Models.API;
 using Server.Services;
+using Server.Services.Database;
 
 namespace Server.Controllers
 {
@@ -13,13 +13,15 @@ namespace Server.Controllers
     [Route("[controller]")]
     public class UploadController : ControllerBase
     {
-        private IRequestVerifier requestVerifier;
-        private IFileStore fileStore;
-        
-        public UploadController(IRequestVerifier requestVerifier, IFileStore fileStore)
+        private readonly IRequestVerifier requestVerifier;
+        private readonly IFileService fileService;
+        private readonly IDatabaseRepository databaseRepository;
+
+        public UploadController(IRequestVerifier requestVerifier, IFileService fileService, IDatabaseRepository databaseRepository)
         {
             this.requestVerifier = requestVerifier;
-            this.fileStore = fileStore;
+            this.fileService = fileService;
+            this.databaseRepository = databaseRepository;
         }
         
         [HttpPost]
@@ -31,30 +33,28 @@ namespace Server.Controllers
             Platforms platform,
             IList<IFormFile> files)
         {
-            var request = new UploadVersionRequest()
-            {
-                Branch = branch,
-                Marketplace = marketplace,
-                Version = version,
-                VersionName = versionName,
-                Platform = platform,
-                Key = key
-            };
+            var request = new UploadVersionRequest(branch, marketplace, version, platform, versionName, key);
+            
             if (files.Count != 1 || !MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
             {
-                ModelState.AddModelError("File", $"The request couldn't be processed (Error 1).");
+                ModelState.AddModelError("errors", $"The request couldn't be processed.");
                 return BadRequest(ModelState);
             }
 
             if (!requestVerifier.VerifyUploadRequest(request, request.Key))
             {
-                ModelState.AddModelError("Key", $"Invalid key");
+                ModelState.AddModelError("errors", $"Invalid key");
                 return BadRequest(ModelState);
             }
 
-            var fileId = await fileStore.AddFile(request.Platform, request.Marketplace, request.Branch, request.Version, files[0]);
+            var updateVersion = await databaseRepository.GetOrCreateVersion(request.Marketplace, request.Branch, request.Version,
+                request.VersionName);
 
-            return Ok(new UploadVersionResponse() {Id = fileId});
+            var file = await fileService.AddFile(request.Platform, request.Marketplace, request.Branch, request.Version, files[0]);
+
+            await databaseRepository.InsertVersionFile(updateVersion, request.Platform, file);
+            
+            return Ok(new UploadVersionResponse() {Id = file.Key});
         }
     }
 }

@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Server.Models;
+using Server.Models.API;
+using Server.Services.Database;
 
 namespace Server.Services
 {
     public class FileStore : IFileStore
     {
-        private Dictionary<Guid, FileInfo> uploaded = new();
-        
         private FileInfo GetFile(Platforms platform, string marketplace, string branch, long version)
         {
             var fi = new FileInfo(Path.Join("uploads", marketplace, branch, $"wde-{platform}-{version}.zip"));
@@ -20,32 +19,22 @@ namespace Server.Services
             return fi;
         }
         
-        public async Task<Guid> AddFile(Platforms platform, string marketplace, string branch, long version, IFormFile file)
+        public async Task<string> AddFile(Platforms platform, string marketplace, string branch, long version, IFormFile file)
         {
             var physFile = GetFile(platform, marketplace, branch, version);
             await using var stream = physFile.OpenWrite();
             await file.CopyToAsync(stream);
-
-            var id = Guid.NewGuid();
-            uploaded.Add(id, physFile);
-            return id;
+            return physFile.FullName;
         }
 
-        public bool FileExists(string id)
+        public bool FileExists(string path)
         {
-            return uploaded.ContainsKey(Guid.Parse(id));
+            return GetFile(path).Exists;
         }
 
-        public FileInfo GetFile(Guid id)
+        public FileInfo GetFile(string path)
         {
-            return uploaded[id];
+            return new FileInfo(path);
         }
-    }
-
-    public interface IFileStore
-    {
-        Task<Guid> AddFile(Platforms platform, string marketplace, string branch, long version, IFormFile file);
-        FileInfo GetFile(Guid id);
-        bool FileExists(string id);
     }
 }

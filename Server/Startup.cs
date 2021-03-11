@@ -9,12 +9,14 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Server.Services;
+using Server.Services.Database;
 
 namespace Server
 {
@@ -38,7 +40,11 @@ namespace Server
             {
                 options.Limits.MaxRequestBodySize = 64 * 1024 * 1024;
             });
+            
+            services.AddDbContext<DatabaseContext>(options => options.UseInMemoryDatabase("abc"));
+            services.AddSingleton<IDatabaseRepository, DatabaseRepository>();
             services.AddSingleton<IFileStore, FileStore>();
+            services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IRequestVerifier, RequestVerifier>();
             services.AddControllers().AddJsonOptions(opts =>
             {
@@ -46,7 +52,7 @@ namespace Server
             });
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Server", Version = "v1"}); });
         }
-
+        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
