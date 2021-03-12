@@ -42,7 +42,7 @@ namespace Server
                 options.Limits.MaxRequestBodySize = 64 * 1024 * 1024;
             });
             
-            services.AddDbContext<DatabaseContext>(options => options.UseInMemoryDatabase("abc"));
+            services.AddDbContext<DatabaseContext>(options => options.UseMySQL(Configuration.GetConnectionString("WdeUpdaterDatabase")));
             services.AddSingleton<IDatabaseRepository, DatabaseRepository>();
             services.AddSingleton<IFileStore, FileStore>();
             services.AddSingleton<IFileService, FileService>();

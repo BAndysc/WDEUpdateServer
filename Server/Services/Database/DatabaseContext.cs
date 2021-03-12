@@ -20,9 +20,17 @@ namespace Server.Services.Database
             modelBuilder.Entity<VersionEntityModel>()
                 .HasIndex(nameof(VersionEntityModel.Version));
             
+            modelBuilder
+                .Entity<VersionFilesModel>()
+                .HasOne(e => e.Version)
+                .WithMany(e => e.Files)
+                .OnDelete(DeleteBehavior.Cascade);
             
-            //modelBuilder.Entity<VersionFilesModel>()
-            //     .HasKey(nameof(VersionFilesModel.Version), nameof(VersionFilesModel.File));
+            modelBuilder
+                .Entity<VersionFilesModel>()
+                .HasOne(e => e.File)
+                .WithMany(e => e.ReferencedVersions)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

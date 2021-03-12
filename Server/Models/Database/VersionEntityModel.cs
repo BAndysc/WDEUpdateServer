@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Server.Models.Database
@@ -12,5 +13,7 @@ namespace Server.Models.Database
         public long Version { get; set; }
         public string TextVersion { get; set; } = "";
         public DateTime ReleaseDate { get; set; }
+
+        public List<VersionFilesModel> Files { get; set; } = null!;
     }
 }

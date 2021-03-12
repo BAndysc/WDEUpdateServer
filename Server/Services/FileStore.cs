@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Server.Models.API;
-using Server.Services.Database;
 
 namespace Server.Services
 {
