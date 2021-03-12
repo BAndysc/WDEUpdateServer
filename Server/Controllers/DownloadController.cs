@@ -21,7 +21,7 @@ namespace Server.Controllers
         [HttpGet("{id}/{key}")]
         public async Task<IActionResult> Get(string id, string key)
         {
-            if (!requestVerifier.VerifyDownloadRequest(id, key))
+            if (!await requestVerifier.VerifyDownloadRequest(id, key))
             {
                 ModelState.AddModelError("errors", $"The request couldn't be authorized.");
                 return BadRequest(ModelState);

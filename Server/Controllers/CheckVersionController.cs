@@ -26,7 +26,7 @@ namespace Server.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(CheckVersionRequest request)
         {
-            if (!requestVerifier.VerifyCheckVersionRequest(request, request.Key))
+            if (!await requestVerifier.VerifyCheckVersionRequest(request, request.Key))
             {
                 ModelState.AddModelError("errors", $"The request couldn't be authorized.");
                 return BadRequest(ModelState);

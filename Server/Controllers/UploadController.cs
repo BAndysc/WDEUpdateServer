@@ -29,11 +29,12 @@ namespace Server.Controllers
             string marketplace, 
             long version,
             string versionName, 
+            string user,
             string key,
             Platforms platform,
             IList<IFormFile> files)
         {
-            var request = new UploadVersionRequest(branch, marketplace, version, platform, versionName, key);
+            var request = new UploadVersionRequest(branch, marketplace, version, platform, versionName, user, key);
             
             if (files.Count != 1 || !MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
             {
@@ -41,7 +42,7 @@ namespace Server.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!requestVerifier.VerifyUploadRequest(request, request.Key))
+            if (!await requestVerifier.VerifyUploadRequest(request, request.User, request.Key))
             {
                 ModelState.AddModelError("errors", $"Invalid key");
                 return BadRequest(ModelState);

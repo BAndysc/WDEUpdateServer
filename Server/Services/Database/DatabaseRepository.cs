@@ -39,6 +39,26 @@ namespace Server.Services.Database
             return lst.Select(a => (a.version, a.file)).ToList();
         }
 
+        public async Task<bool> ValidateUserKey(string username, string key)
+        {
+            var user = await databaseContext.Users.SingleOrDefaultAsync(v => v.User == username);
+
+            if (user == null)
+                return false;
+
+            return BCrypt.Net.BCrypt.Verify(key, user.KeyHash);
+        }
+        
+        public async Task<bool> ValidateMarketplace(string marketplaceName, string? key)
+        {
+            var marketplace = await databaseContext.Marketplaces.SingleOrDefaultAsync(v => v.Name == marketplaceName);
+
+            if (marketplace == null)
+                return false;
+
+            return marketplace.Key == null || BCrypt.Net.BCrypt.Verify(key, marketplace.Key);
+        }
+        
         public async Task InsertVersionFile(VersionEntityModel updateVersion, Platforms platform, FileEntityModel file)
         {
             var previous = await databaseContext.VersionFiles.SingleOrDefaultAsync(v => v.Version == updateVersion && v.Platform == platform);

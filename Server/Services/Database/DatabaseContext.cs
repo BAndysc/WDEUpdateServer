@@ -10,6 +10,8 @@ namespace Server.Services.Database
         public DbSet<FileEntityModel> Files => Set<FileEntityModel>();
         public DbSet<VersionEntityModel> Versions => Set<VersionEntityModel>();
         public DbSet<VersionFilesModel> VersionFiles => Set<VersionFilesModel>();
+        public DbSet<UserModel> Users => Set<UserModel>();
+        public DbSet<MarketplaceModel> Marketplaces => Set<MarketplaceModel>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

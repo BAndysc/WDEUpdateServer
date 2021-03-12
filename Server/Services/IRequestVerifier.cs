@@ -1,12 +1,12 @@
-using Server.Models;
+using System.Threading.Tasks;
 using Server.Models.API;
 
 namespace Server.Services
 {
     public interface IRequestVerifier
     {
-        bool VerifyUploadRequest(UploadVersionRequest request, string key);
-        bool VerifyDownloadRequest(string id, string key);
-        bool VerifyCheckVersionRequest(CheckVersionRequest request, string key);
+        Task<bool> VerifyUploadRequest(UploadVersionRequest request, string user, string key);
+        Task<bool> VerifyDownloadRequest(string id, string key);
+        Task<bool> VerifyCheckVersionRequest(CheckVersionRequest request, string key);
     }
 }

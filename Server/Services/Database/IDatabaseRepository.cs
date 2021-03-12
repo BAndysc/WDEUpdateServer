@@ -15,6 +15,9 @@ namespace Server.Services.Database
         Task<VersionEntityModel> GetOrCreateVersion(string marketplace, string branch, long version,
             string textVersion);
 
+        Task<bool> ValidateUserKey(string user, string key);
+        Task<bool> ValidateMarketplace(string marketplace, string? key);
+        
         Task InsertVersionFile(VersionEntityModel updateVersion, Platforms requestPlatform, FileEntityModel file);
     }
 }
