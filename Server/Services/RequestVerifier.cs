@@ -14,12 +14,12 @@ namespace Server.Services
             this.databaseRepository = databaseRepository;
         }
         
-        public async Task<bool> VerifyDownloadRequest(string id, string key)
+        public async Task<bool> VerifyDownloadRequest(string id, string? key)
         {
             return true;
         }
 
-        public async Task<bool> VerifyCheckVersionRequest(CheckVersionRequest request, string key)
+        public async Task<bool> VerifyCheckVersionRequest(CheckVersionRequest request, string? key)
         {
             return await databaseRepository.ValidateMarketplace(request.Marketplace, key);
         }

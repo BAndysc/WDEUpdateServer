@@ -18,8 +18,8 @@ namespace Server.Controllers
             this.requestVerifier = requestVerifier;
         }
         
-        [HttpGet("{id}/{key}")]
-        public async Task<IActionResult> Get(string id, string key)
+        [HttpGet("{id}/{key?}")]
+        public async Task<IActionResult> Get(string id, string? key = null)
         {
             if (!await requestVerifier.VerifyDownloadRequest(id, key))
             {

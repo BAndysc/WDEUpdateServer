@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -25,15 +26,25 @@ namespace Server.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> Post(string branch, 
-            string marketplace, 
-            long version,
-            string versionName, 
-            string user,
-            string key,
-            Platforms platform,
-            IList<IFormFile> files)
+        public async Task<IActionResult> Post(IFormCollection data, IList<IFormFile> files)
         {
+            if (!data.TryGetValue("branch", out var branch))
+                return BadRequest();
+            if (!data.TryGetValue("marketplace", out var marketplace))
+                return BadRequest();
+            if (!data.TryGetValue("version", out var versionString) || !long.TryParse(versionString, out var version))
+                return BadRequest();
+            if (!data.TryGetValue("versionName", out var versionName))
+                return BadRequest();
+            if (!data.TryGetValue("user", out var user))
+                return BadRequest();
+            if (!data.TryGetValue("key", out var key))
+                return BadRequest();
+            if (!data.TryGetValue("platform", out var platformString) ||
+                !Enum.TryParse(typeof(Platforms), platformString, true, out var platfomEnum) ||
+                platfomEnum is not Platforms platform)
+                return BadRequest();
+            
             var request = new UploadVersionRequest(branch, marketplace, version, platform, versionName, user, key);
             
             if (files.Count != 1 || !MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
