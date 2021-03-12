@@ -8,16 +8,19 @@ namespace Server.Services.Database
 {
     public interface IDatabaseRepository
     {
-        Task<bool> InsertFile(FileEntityModel model);
+        Task<bool> InsertFile(UserModel uploader, FileEntityModel model);
         Task<string?> GetFilePath(Guid guid);
         Task<List<(VersionEntityModel version, VersionFilesModel file)>> GetChangelog(string marketplace, string branch, long startVersion, Platforms platform);
         Task<VersionFilesModel?> GetFileForVersion(VersionEntityModel version, Platforms platform);
         Task<VersionEntityModel> GetOrCreateVersion(string marketplace, string branch, long version,
             string textVersion);
 
+        Task<UserModel> GetUserByName(string user);
         Task<bool> ValidateUserKey(string user, string key);
         Task<bool> ValidateMarketplace(string marketplace, string? key);
         
-        Task InsertVersionFile(VersionEntityModel updateVersion, Platforms requestPlatform, FileEntityModel file);
+        Task<FileEntityModel?> InsertVersionFile(VersionEntityModel updateVersion, Platforms requestPlatform, FileEntityModel file);
+        Task<List<VersionFilesModel>> GetOldFiles(string marketplace, string branch, long requestVersion, Platforms platform);
+        Task RemoveFile(FileEntityModel file);
     }
 }

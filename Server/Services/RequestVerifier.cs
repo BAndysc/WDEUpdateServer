@@ -14,9 +14,9 @@ namespace Server.Services
             this.databaseRepository = databaseRepository;
         }
         
-        public async Task<bool> VerifyDownloadRequest(string id, string? key)
+        public Task<bool> VerifyDownloadRequest(string id, string? key)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         public async Task<bool> VerifyCheckVersionRequest(CheckVersionRequest request, string? key)

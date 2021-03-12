@@ -9,7 +9,7 @@ using Server.Services.Database;
 namespace Server.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20210312013857_InitialCreate")]
+    [Migration("20210312172203_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,7 +29,15 @@ namespace Server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("UploaderUser")
+                        .HasColumnType("varchar(767)");
+
                     b.HasKey("Key");
+
+                    b.HasIndex("UploaderUser");
 
                     b.ToTable("Files");
                 });
@@ -120,6 +128,15 @@ namespace Server.Migrations
                     b.HasIndex("VersionId");
 
                     b.ToTable("VersionFiles");
+                });
+
+            modelBuilder.Entity("Server.Models.Database.FileEntityModel", b =>
+                {
+                    b.HasOne("Server.Models.Database.UserModel", "Uploader")
+                        .WithMany()
+                        .HasForeignKey("UploaderUser");
+
+                    b.Navigation("Uploader");
                 });
 
             modelBuilder.Entity("Server.Models.Database.VersionFilesModel", b =>

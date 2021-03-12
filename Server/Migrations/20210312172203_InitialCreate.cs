@@ -8,18 +8,6 @@ namespace Server.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Files",
-                columns: table => new
-                {
-                    Key = table.Column<byte[]>(type: "varbinary(16)", nullable: false),
-                    Path = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Files", x => x.Key);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Marketplaces",
                 columns: table => new
                 {
@@ -60,6 +48,26 @@ namespace Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Files",
+                columns: table => new
+                {
+                    Key = table.Column<byte[]>(type: "varbinary(16)", nullable: false),
+                    Path = table.Column<string>(type: "text", nullable: false),
+                    UploadDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UploaderUser = table.Column<string>(type: "varchar(767)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Files", x => x.Key);
+                    table.ForeignKey(
+                        name: "FK_Files_Users_UploaderUser",
+                        column: x => x.UploaderUser,
+                        principalTable: "Users",
+                        principalColumn: "User",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "VersionFiles",
                 columns: table => new
                 {
@@ -84,6 +92,11 @@ namespace Server.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Files_UploaderUser",
+                table: "Files",
+                column: "UploaderUser");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VersionFiles_FileKey",
@@ -117,9 +130,6 @@ namespace Server.Migrations
                 name: "Marketplaces");
 
             migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
                 name: "VersionFiles");
 
             migrationBuilder.DropTable(
@@ -127,6 +137,9 @@ namespace Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "Versions");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

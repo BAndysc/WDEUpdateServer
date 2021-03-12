@@ -30,6 +30,12 @@ namespace Server.Services
             return GetFile(path).Exists;
         }
 
+        public Task RemoveFile(string path)
+        {
+            GetFile(path).Delete();
+            return Task.CompletedTask;
+        }
+        
         public FileInfo GetFile(string path)
         {
             return new FileInfo(path);

@@ -59,13 +59,20 @@ namespace Server.Controllers
                 return BadRequest(ModelState);
             }
 
+            var userModel = await databaseRepository.GetUserByName(request.User);
+            
             var updateVersion = await databaseRepository.GetOrCreateVersion(request.Marketplace, request.Branch, request.Version,
                 request.VersionName);
+            
+            var file = await fileService.AddFile(userModel, request.Platform, request.Marketplace, request.Branch, request.Version, files[0]);
 
-            var file = await fileService.AddFile(request.Platform, request.Marketplace, request.Branch, request.Version, files[0]);
+            var oldFiles = await databaseRepository.GetOldFiles(request.Marketplace, request.Branch, request.Version, request.Platform);
+
+            foreach (var oldFile in oldFiles)
+                await fileService.RemoveFile(oldFile.File);
 
             await databaseRepository.InsertVersionFile(updateVersion, request.Platform, file);
-            
+
             return Ok(new UploadVersionResponse() {Id = file.Key});
         }
     }

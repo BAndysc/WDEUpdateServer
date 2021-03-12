@@ -10,5 +10,6 @@ namespace Server.Services
         Task<string> AddFile(Platforms platform, string marketplace, string branch, long version, IFormFile file);
         FileInfo GetFile(string id);
         bool FileExists(string id);
+        Task RemoveFile(string path);
     }
 }

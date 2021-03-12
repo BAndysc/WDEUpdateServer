@@ -19,7 +19,7 @@ namespace Server.Services
             this.fileStore = fileStore;
         }
 
-        public async Task<FileEntityModel> AddFile(Platforms platform, string marketplace, string branch, long version, IFormFile file)
+        public async Task<FileEntityModel> AddFile(UserModel uploader, Platforms platform, string marketplace, string branch, long version, IFormFile file)
         {
             var path = await fileStore.AddFile(platform, marketplace, branch, version, file);
             
@@ -27,7 +27,8 @@ namespace Server.Services
             {
                 Path = path
             };
-            await databaseRepository.InsertFile(model);
+            
+            await databaseRepository.InsertFile(uploader, model);
             
             return model;
         }
@@ -53,6 +54,12 @@ namespace Server.Services
         private async Task<string?> GetPath(Guid guid)
         {
             return await databaseRepository.GetFilePath(guid);
+        }
+
+        public async Task RemoveFile(FileEntityModel oldFile)
+        {
+            await fileStore.RemoveFile(oldFile.Path);
+            await databaseRepository.RemoveFile(oldFile);
         }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Models.API;
 using Server.Models.Database;
+using Z.EntityFramework.Plus;
 
 namespace Server.Services.Database
 {
@@ -18,6 +19,8 @@ namespace Server.Services.Database
         {
             scope = serviceProvider.CreateScope();
             databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+            
+            databaseContext.Database.Migrate();
         }
 
         public async Task<VersionFilesModel?> GetFileForVersion(VersionEntityModel version, Platforms platform)
@@ -59,11 +62,15 @@ namespace Server.Services.Database
             return marketplace.Key == null || BCrypt.Net.BCrypt.Verify(key, marketplace.Key);
         }
         
-        public async Task InsertVersionFile(VersionEntityModel updateVersion, Platforms platform, FileEntityModel file)
+        public async Task<FileEntityModel?> InsertVersionFile(VersionEntityModel updateVersion, Platforms platform, FileEntityModel file)
         {
-            var previous = await databaseContext.VersionFiles.SingleOrDefaultAsync(v => v.Version == updateVersion && v.Platform == platform);
+            FileEntityModel? old = null;
+            var previous = await databaseContext.VersionFiles.SingleOrDefaultAsync(v => v.Version.Id == updateVersion.Id && v.Platform == platform);
             if (previous != null)
+            {
+                old = previous.File;
                 previous.File = file;
+            }
             else
             {
                 await databaseContext.VersionFiles.AddAsync(new VersionFilesModel()
@@ -74,8 +81,21 @@ namespace Server.Services.Database
                 });
             }
             await databaseContext.SaveChangesAsync();
+            return old;
         }
-        
+
+        public async Task<List<VersionFilesModel>> GetOldFiles(string marketplace, string branch, long version, Platforms platform)
+        {
+            return await databaseContext.VersionFiles
+                .Where(v => v.Version.Marketplace == marketplace &&
+                            v.Version.Branch == branch &&
+                            v.Platform == platform &&
+                            v.Version.Version <= version)
+                .Include(e => e.File)
+                .Include(e => e.Version)
+                .ToListAsync();
+        }
+
         public async Task<VersionEntityModel> GetOrCreateVersion(string marketplace, string branch, long version, string textVersion)
         {
             var existing = await databaseContext.Versions.FirstOrDefaultAsync(v => v.Marketplace == marketplace &&
@@ -100,13 +120,27 @@ namespace Server.Services.Database
             return @new;
         }
         
-        public async Task<bool> InsertFile(FileEntityModel model)
+        public async Task<bool> InsertFile(UserModel uploader, FileEntityModel model)
         {
+            model.Uploader = uploader;
+            model.UploadDate = DateTime.Now;
             await databaseContext.Files.AddAsync(model);
 
             return await databaseContext.SaveChangesAsync() == 1;
         }
 
+        public async Task<UserModel> GetUserByName(string user)
+        {
+            return await databaseContext.Users.SingleAsync(u => u.User == user);
+        }
+
+        public async Task RemoveFile(FileEntityModel file)
+        {
+            databaseContext.Files.Remove(file);
+            await databaseContext.SaveChangesAsync();
+        }
+        
+        
         public async Task<string?> GetFilePath(Guid guid)
         {
             var model = await databaseContext.Files.FindAsync(guid);
