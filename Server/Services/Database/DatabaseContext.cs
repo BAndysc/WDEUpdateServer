@@ -12,6 +12,7 @@ namespace Server.Services.Database
         public DbSet<VersionFilesModel> VersionFiles => Set<VersionFilesModel>();
         public DbSet<UserModel> Users => Set<UserModel>();
         public DbSet<MarketplaceModel> Marketplaces => Set<MarketplaceModel>();
+        public DbSet<ChangeLogEntryModel> ChangelogEntries => Set<ChangeLogEntryModel>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,6 +27,12 @@ namespace Server.Services.Database
                 .Entity<VersionFilesModel>()
                 .HasOne(e => e.Version)
                 .WithMany(e => e.Files)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder
+                .Entity<VersionEntityModel>()
+                .HasMany<ChangeLogEntryModel>(e => e.Changes)
+                .WithOne(e => e.Version)
                 .OnDelete(DeleteBehavior.Cascade);
             
             modelBuilder

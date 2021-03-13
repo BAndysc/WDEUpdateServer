@@ -13,6 +13,7 @@ namespace Server.Services.Database
         Task<List<(VersionEntityModel version, FileEntityModel file)>> GetLatestVersion(string marketplace, string branch, long startVersion, Platforms platform);
         Task<List<VersionEntityModel>> GetChangelog(string marketplace, string branch, long startVersion, Platforms platform);
         Task<VersionFilesModel?> GetFileForVersion(VersionEntityModel version, Platforms platform);
+        Task<VersionEntityModel?> GetVersion(string marketplace, string branch, long version);
         Task<VersionEntityModel> GetOrCreateVersion(string marketplace, string branch, long version,
             string textVersion);
 
@@ -23,5 +24,6 @@ namespace Server.Services.Database
         Task<FileEntityModel?> InsertVersionFile(VersionEntityModel updateVersion, Platforms requestPlatform, FileEntityModel file);
         Task<List<VersionFilesModel>> GetOldFiles(string marketplace, string branch, long requestVersion, Platforms platform);
         Task RemoveFile(FileEntityModel file);
+        Task AddChangelogEntry(VersionEntityModel version, string entry);
     }
 }

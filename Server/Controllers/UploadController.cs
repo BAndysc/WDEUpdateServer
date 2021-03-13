@@ -45,7 +45,7 @@ namespace Server.Controllers
                 platfomEnum is not Platforms platform)
                 return BadRequest();
             
-            var request = new UploadVersionRequest(branch, marketplace, version, platform, versionName, user, key);
+            var request = new UploadVersionRequest(new VersionKey(branch, marketplace, version), new Authentication(user, key), platform, versionName);
             
             if (files.Count != 1 || !MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
             {
@@ -53,20 +53,20 @@ namespace Server.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!await requestVerifier.VerifyUploadRequest(request, request.User, request.Key))
+            if (!await requestVerifier.VerifyUploadRequest(request, request.User))
             {
                 ModelState.AddModelError("errors", $"Invalid key");
                 return BadRequest(ModelState);
             }
 
-            var userModel = await databaseRepository.GetUserByName(request.User);
+            var userModel = await databaseRepository.GetUserByName(request.User.User);
             
-            var updateVersion = await databaseRepository.GetOrCreateVersion(request.Marketplace, request.Branch, request.Version,
+            var updateVersion = await databaseRepository.GetOrCreateVersion(request.Version.Marketplace, request.Version.Branch, request.Version.Version,
                 request.VersionName);
             
-            var file = await fileService.AddFile(userModel, request.Platform, request.Marketplace, request.Branch, request.Version, files[0]);
+            var file = await fileService.AddFile(userModel, request.Platform, request.Version.Marketplace, request.Version.Branch, request.Version.Version, files[0]);
 
-            var oldFiles = await databaseRepository.GetOldFiles(request.Marketplace, request.Branch, request.Version, request.Platform);
+            var oldFiles = await databaseRepository.GetOldFiles(request.Version.Marketplace, request.Version.Branch, request.Version.Version, request.Platform);
 
             foreach (var oldFile in oldFiles)
                 await fileService.RemoveFile(oldFile.File);

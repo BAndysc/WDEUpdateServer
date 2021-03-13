@@ -13,6 +13,7 @@ namespace Server.Models.Database
         public long Version { get; set; }
         public string TextVersion { get; set; } = "";
         public DateTime ReleaseDate { get; set; }
+        public List<ChangeLogEntryModel> Changes { get; set; } = null!;
 
         public List<VersionFilesModel> Files { get; set; } = null!;
     }

@@ -50,10 +50,13 @@ namespace Server.Services.Database
         
         public async Task<List<VersionEntityModel>> GetChangelog(string marketplace, string branch, long startVersion, Platforms platform)
         {
-            return await databaseContext.Versions.Where(v => v.Marketplace == marketplace &&
-                                                                v.Branch == branch &&
-                                                                v.Version > startVersion)
-                .OrderByDescending(p => p.Version).ToListAsync();
+            return await databaseContext.Versions.
+                Where(v => v.Marketplace == marketplace &&
+                                        v.Branch == branch &&
+                                        v.Version > startVersion)
+                .Include(v => v.Changes)
+                .OrderByDescending(p => p.Version)
+                .ToListAsync();
         }
 
         public async Task<bool> ValidateUserKey(string username, string key)
@@ -110,15 +113,20 @@ namespace Server.Services.Database
                 .ToListAsync();
         }
 
-        public async Task<VersionEntityModel> GetOrCreateVersion(string marketplace, string branch, long version, string textVersion)
+        public async Task<VersionEntityModel?> GetVersion(string marketplace, string branch, long version)
         {
-            var existing = await databaseContext.Versions.FirstOrDefaultAsync(v => v.Marketplace == marketplace &&
+            return await databaseContext.Versions.FirstOrDefaultAsync(v => v.Marketplace == marketplace &&
                 v.Branch == branch &&
                 v.Version == version);
+        }
+        
+        public async Task<VersionEntityModel> GetOrCreateVersion(string marketplace, string branch, long version, string textVersion)
+        {
+            var existing = await GetVersion(marketplace, branch, version);
 
             if (existing != null)
                 return existing;
-
+            
             var @new = new VersionEntityModel()
             {
                 Branch = branch,
@@ -154,11 +162,16 @@ namespace Server.Services.Database
             await databaseContext.SaveChangesAsync();
         }
         
-        
         public async Task<string?> GetFilePath(Guid guid)
         {
             var model = await databaseContext.Files.FindAsync(guid);
             return model?.Path;
+        }
+
+        public async Task AddChangelogEntry(VersionEntityModel version, string entry)
+        {
+            await databaseContext.ChangelogEntries.AddAsync(new ChangeLogEntryModel() {Version = version, Change = entry});
+            await databaseContext.SaveChangesAsync();
         }
     }
 }

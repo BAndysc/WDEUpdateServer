@@ -24,9 +24,14 @@ namespace Server.Services
             return await databaseRepository.ValidateMarketplace(request.Marketplace, key);
         }
 
-        public async Task<bool> VerifyUploadRequest(UploadVersionRequest request, string user, string key)
+        public async Task<bool> VerifyUploadRequest(UploadVersionRequest request, Authentication user)
         {
-            return await databaseRepository.ValidateUserKey(user, key);
+            return await VerifyModifyChangelogRequest(user);
+        }
+
+        public async Task<bool> VerifyModifyChangelogRequest(Authentication user)
+        {
+            return await databaseRepository.ValidateUserKey(user.User, user.Key);
         }
     }
 }
