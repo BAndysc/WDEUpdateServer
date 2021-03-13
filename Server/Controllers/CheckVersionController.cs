@@ -31,13 +31,23 @@ namespace Server.Controllers
                 ModelState.AddModelError("errors", $"The request couldn't be authorized.");
                 return BadRequest(ModelState);
             }
-            
+
+            var downloads = await repository.GetLatestVersion(request.Marketplace, request.Branch,
+                request.CurrentVersion, request.Platform);
+
+            if (downloads.Count == 0 || downloads[0].Files.Count == 0)
+            {
+                return Ok(new CheckVersionResponse(request.CurrentVersion, null));
+            }
+
+            var latestVersion = downloads[0].Files[0].Version.Version;
+            var downloadFile = downloads[0].Files[0].File.Key;
             var updates = await repository.GetChangelog(request.Marketplace, request.Branch, request.CurrentVersion, request.Platform);
-            var latestVersion = updates.Count > 0 ? updates[0].version.Version : request.CurrentVersion;
-            var downloadFile = updates.Count > 0 ? (Guid?)updates[0].file.File.Key : null;
             
-            return Ok(new CheckVersionResponse(latestVersion, downloadFile == null ? null : $"/Download/{downloadFile}/{request.Key}",
-                updates.Select(version => new ChangeLogEntry(version.version.Version, version.version.TextVersion, version.version.ReleaseDate, "Release")).ToArray()));
+            return Ok(new CheckVersionResponse(latestVersion,  $"/Download/{downloadFile}/{request.Key}",
+                updates
+                    .Where(u => u.Version <= latestVersion)
+                    .Select(version => new ChangeLogEntry(version.Version, version.TextVersion, version.ReleaseDate, null)).ToArray()));
         }
     }
 }

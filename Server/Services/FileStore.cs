@@ -2,27 +2,39 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Server.Models.API;
 
 namespace Server.Services
 {
     public class FileStore : IFileStore
     {
-        private FileInfo GetFile(Platforms platform, string marketplace, string branch, long version)
+        private FileInfo uploadDictionary;
+        
+        public FileStore(IConfiguration configuration)
         {
-            var fi = new FileInfo(Path.Join("uploads", marketplace, branch, $"wde-{platform}-{version}.zip"));
+            uploadDictionary = new FileInfo(configuration["UploadPath"]);
+            if (uploadDictionary == null)
+                throw new Exception();
+            uploadDictionary.Directory!.Create();
+        }
+        
+        private (FileInfo, string) GetFile(Platforms platform, string marketplace, string branch, long version)
+        {
+            var filePath = Path.Join(marketplace, branch, $"wde-{platform}-{version}.zip");
+            var fi = new FileInfo(Path.Join(uploadDictionary.FullName, filePath));
             if (fi.Directory == null)
                 throw new ArgumentException();
             fi.Directory.Create();
-            return fi;
+            return (fi, filePath);
         }
         
         public async Task<string> AddFile(Platforms platform, string marketplace, string branch, long version, IFormFile file)
         {
-            var physFile = GetFile(platform, marketplace, branch, version);
+            var (physFile, filePath) = GetFile(platform, marketplace, branch, version);
             await using var stream = physFile.OpenWrite();
             await file.CopyToAsync(stream);
-            return physFile.FullName;
+            return filePath;
         }
 
         public bool FileExists(string path)
@@ -32,13 +44,15 @@ namespace Server.Services
 
         public Task RemoveFile(string path)
         {
-            GetFile(path).Delete();
+            var file = GetFile(path);
+            if (file.Exists)
+                file.Delete();
             return Task.CompletedTask;
         }
         
         public FileInfo GetFile(string path)
         {
-            return new FileInfo(path);
+            return new FileInfo(Path.Join(uploadDictionary.FullName, path));
         }
     }
 }

@@ -29,17 +29,24 @@ namespace Server.Services.Database
                 v.Version == version && v.Platform == platform);
         }
         
-        public async Task<List<(VersionEntityModel version, VersionFilesModel file)>> GetChangelog(string marketplace, string branch, long startVersion, Platforms platform)
+        public async Task<List<VersionEntityModel>> GetLatestVersion(string marketplace, string branch, long startVersion, Platforms platform)
         {
-            var lst = await databaseContext.Versions.Where(v => v.Marketplace == marketplace &&
+            return await databaseContext.Versions
+                .Include(v => v.Files.Where(f => f.Platform == platform))
+                .ThenInclude(t => t.File)
+                .Where(v => v.Marketplace == marketplace &&
+                            v.Branch == branch &&
+                            v.Files.Count > 0 &&
+                            v.Version > startVersion)
+                .OrderByDescending(p => p.Version).ToListAsync();
+        }
+        
+        public async Task<List<VersionEntityModel>> GetChangelog(string marketplace, string branch, long startVersion, Platforms platform)
+        {
+            return await databaseContext.Versions.Where(v => v.Marketplace == marketplace &&
                                                                 v.Branch == branch &&
                                                                 v.Version > startVersion)
-                .Join(databaseContext.VersionFiles,
-                    p => new {version = p.Id, platform = platform},
-                    f => new {version = f.Version.Id, platform = f.Platform},
-                    (version, file) => new {version, file})
-                .OrderByDescending(p => p.version.Version).ToListAsync();
-            return lst.Select(a => (a.version, a.file)).ToList();
+                .OrderByDescending(p => p.Version).ToListAsync();
         }
 
         public async Task<bool> ValidateUserKey(string username, string key)
