@@ -29,16 +29,23 @@ namespace Server.Services.Database
                 v.Version == version && v.Platform == platform);
         }
         
-        public async Task<List<VersionEntityModel>> GetLatestVersion(string marketplace, string branch, long startVersion, Platforms platform)
+        public async Task<List<(VersionEntityModel, FileEntityModel)>> GetLatestVersion(string marketplace, string branch, long startVersion, Platforms platform)
         {
-            return await databaseContext.Versions
-                .Include(v => v.Files.Where(f => f.Platform == platform))
-                .ThenInclude(t => t.File)
-                .Where(v => v.Marketplace == marketplace &&
-                            v.Branch == branch &&
-                            v.Files.Count > 0 &&
-                            v.Version > startVersion)
-                .OrderByDescending(p => p.Version).ToListAsync();
+            var lst = await databaseContext.Versions
+                .Join(databaseContext.VersionFiles,
+                    v => new {id = v, platform = platform},
+                    vf => new {id = vf.Version, platform = vf.Platform},
+                    (v, vf) => new {version = v, versionFile = vf})
+                .Join(databaseContext.Files,
+                    vvf => vvf.versionFile.File,
+                    f => f,
+                    (vvf, f) => new {version = vvf.version, versionFile = vvf.versionFile, file = f})
+                .Where(v => v.version.Marketplace == marketplace &&
+                            v.version.Branch == branch &&
+                            v.version.Version > startVersion)
+                .OrderByDescending(p => p.version.Version)
+                .ToListAsync();
+            return lst.Select(tuple => (tuple.version, tuple.file)).ToList();
         }
         
         public async Task<List<VersionEntityModel>> GetChangelog(string marketplace, string branch, long startVersion, Platforms platform)

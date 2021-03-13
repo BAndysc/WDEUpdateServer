@@ -10,7 +10,7 @@ namespace Server.Services.Database
     {
         Task<bool> InsertFile(UserModel uploader, FileEntityModel model);
         Task<string?> GetFilePath(Guid guid);
-        Task<List<VersionEntityModel>> GetLatestVersion(string marketplace, string branch, long startVersion, Platforms platform);
+        Task<List<(VersionEntityModel version, FileEntityModel file)>> GetLatestVersion(string marketplace, string branch, long startVersion, Platforms platform);
         Task<List<VersionEntityModel>> GetChangelog(string marketplace, string branch, long startVersion, Platforms platform);
         Task<VersionFilesModel?> GetFileForVersion(VersionEntityModel version, Platforms platform);
         Task<VersionEntityModel> GetOrCreateVersion(string marketplace, string branch, long version,

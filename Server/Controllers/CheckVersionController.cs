@@ -35,13 +35,13 @@ namespace Server.Controllers
             var downloads = await repository.GetLatestVersion(request.Marketplace, request.Branch,
                 request.CurrentVersion, request.Platform);
 
-            if (downloads.Count == 0 || downloads[0].Files.Count == 0)
+            if (downloads.Count == 0)
             {
                 return Ok(new CheckVersionResponse(request.CurrentVersion, null));
             }
 
-            var latestVersion = downloads[0].Files[0].Version.Version;
-            var downloadFile = downloads[0].Files[0].File.Key;
+            var latestVersion = downloads[0].version.Version;
+            var downloadFile = downloads[0].file.Key;
             var updates = await repository.GetChangelog(request.Marketplace, request.Branch, request.CurrentVersion, request.Platform);
             
             return Ok(new CheckVersionResponse(latestVersion,  $"/Download/{downloadFile}/{request.Key}",
