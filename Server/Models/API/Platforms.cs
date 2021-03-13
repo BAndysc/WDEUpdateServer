@@ -2,9 +2,9 @@ namespace Server.Models.API
 {
     public enum Platforms
     {
-        Windows,
-        MacOs,
-        Linux,
-        Universal
+        Windows = 0,
+        MacOs = 1,
+        Linux = 2,
+        WindowsWpf = 3
     }
 }
