@@ -24,6 +24,26 @@ namespace Server.Controllers
             this.fileService = fileService;
             this.databaseRepository = databaseRepository;
         }
+
+        [HttpPost("/Latest")]
+        public async Task<IActionResult> GetLatestVersion(IFormCollection data)
+        {
+            if (!data.TryGetValue("marketplace", out var marketplace))
+                return BadRequest();
+            if (!data.TryGetValue("user", out var user))
+                return BadRequest();
+            if (!data.TryGetValue("key", out var key))
+                return BadRequest();
+            
+            if (!await requestVerifier.VerifyUploader(new Authentication(user, key)))
+            {
+                ModelState.AddModelError("errors", $"Invalid key");
+                return BadRequest(ModelState);
+            }
+
+            var latest = await databaseRepository.GetLatestVersionAnyBranch(marketplace);
+            return Content((latest?.Version ?? -1).ToString());
+        }
         
         [HttpPost]
         public async Task<IActionResult> Post(IFormCollection data, IList<IFormFile> files)

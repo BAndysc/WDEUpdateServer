@@ -9,5 +9,6 @@ namespace Server.Services
         Task<bool> VerifyDownloadRequest(string id, string? key);
         Task<bool> VerifyCheckVersionRequest(CheckVersionRequest request, string? key);
         Task<bool> VerifyModifyChangelogRequest(Authentication user);
+        Task<bool> VerifyUploader(Authentication authentication);
     }
 }

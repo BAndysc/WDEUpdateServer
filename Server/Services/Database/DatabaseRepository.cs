@@ -173,5 +173,15 @@ namespace Server.Services.Database
             await databaseContext.ChangelogEntries.AddAsync(new ChangeLogEntryModel() {Version = version, Change = entry});
             await databaseContext.SaveChangesAsync();
         }
+
+        public async Task<VersionEntityModel?> GetLatestVersionAnyBranch(string marketplace)
+        {
+            var list = await databaseContext.Versions
+                .Where(v => v.Marketplace == marketplace)
+                .OrderByDescending(v => v.Version)
+                .Take(1)
+                .ToListAsync();
+            return list.Count == 0 ? null : list[0];
+        }
     }
 }
