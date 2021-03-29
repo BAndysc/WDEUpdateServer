@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -29,11 +30,26 @@ namespace Server.Services
             return (fi, filePath);
         }
         
-        public async Task<string> AddFile(Platforms platform, string marketplace, string branch, long version, IFormFile file)
+        public async Task<string> AddFile(Platforms platform, string marketplace, string branch, long version, IFormFile file, string[]? pathsToMakeExecutable)
         {
             var (physFile, filePath) = GetFile(platform, marketplace, branch, version);
-            await using var stream = physFile.OpenWrite();
-            await file.CopyToAsync(stream);
+            {
+                await using var stream = physFile.OpenWrite();
+                await file.CopyToAsync(stream);
+            }
+            if (pathsToMakeExecutable != null)
+            {
+                using ZipArchive zip = ZipFile.Open(physFile.FullName, ZipArchiveMode.Update);
+                foreach (var exec in pathsToMakeExecutable)
+                {
+                    var entry = zip.GetEntry(exec);
+                    if (entry != null)
+                    {
+                        entry.ExternalAttributes = Convert.ToInt32("644", 8) << 16;
+                        entry.ExternalAttributes |= Convert.ToInt32("755", 8) << 16;
+                    }
+                }
+            }
             return filePath;
         }
 

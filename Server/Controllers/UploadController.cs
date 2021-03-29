@@ -64,6 +64,10 @@ namespace Server.Controllers
                 !Enum.TryParse(typeof(Platforms), platformString, true, out var platfomEnum) ||
                 platfomEnum is not Platforms platform)
                 return BadRequest();
+
+            string[]? pathsToMakeExecutable = null;
+            if (data.TryGetValue("make_exec", out var makeExecString))
+                pathsToMakeExecutable = makeExecString.ToArray();
             
             var request = new UploadVersionRequest(new VersionKey(branch, marketplace, version), new Authentication(user, key), platform, versionName);
             
@@ -84,7 +88,7 @@ namespace Server.Controllers
             var updateVersion = await databaseRepository.GetOrCreateVersion(request.Version.Marketplace, request.Version.Branch, request.Version.Version,
                 request.VersionName);
             
-            var file = await fileService.AddFile(userModel, request.Platform, request.Version.Marketplace, request.Version.Branch, request.Version.Version, files[0]);
+            var file = await fileService.AddFile(userModel, request.Platform, request.Version.Marketplace, request.Version.Branch, request.Version.Version, files[0], pathsToMakeExecutable);
 
             var oldFiles = await databaseRepository.GetOldFiles(request.Version.Marketplace, request.Version.Branch, request.Version.Version, request.Platform);
 

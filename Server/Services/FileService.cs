@@ -19,9 +19,9 @@ namespace Server.Services
             this.fileStore = fileStore;
         }
 
-        public async Task<FileEntityModel> AddFile(UserModel uploader, Platforms platform, string marketplace, string branch, long version, IFormFile file)
+        public async Task<FileEntityModel> AddFile(UserModel uploader, Platforms platform, string marketplace, string branch, long version, IFormFile file, string[]? pathsToMakeExecutable)
         {
-            var path = await fileStore.AddFile(platform, marketplace, branch, version, file);
+            var path = await fileStore.AddFile(platform, marketplace, branch, version, file, pathsToMakeExecutable);
             
             var model = new FileEntityModel()
             {
