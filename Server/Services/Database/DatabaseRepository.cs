@@ -183,5 +183,12 @@ namespace Server.Services.Database
                 .ToListAsync();
             return list.Count == 0 ? null : list[0];
         }
+
+        public async Task<StaticFileModel?> GetStaticFile(string name)
+        {
+            return await databaseContext.StaticFiles
+                .Where(v => v.FileName == name)
+                .FirstOrDefaultAsync();
+        }
     }
 }

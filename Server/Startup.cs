@@ -47,6 +47,7 @@ namespace Server
             services.AddSingleton<IFileStore, FileStore>();
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IRequestVerifier, RequestVerifier>();
+            services.AddSingleton<IStaticFileService, StaticFileService>();
             services.AddControllers().AddJsonOptions(opts =>
             {
                 opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());

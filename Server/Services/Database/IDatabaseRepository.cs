@@ -26,5 +26,7 @@ namespace Server.Services.Database
         Task<List<VersionFilesModel>> GetOldFiles(string marketplace, string branch, long requestVersion, Platforms platform);
         Task RemoveFile(FileEntityModel file);
         Task AddChangelogEntry(VersionEntityModel version, string entry);
+
+        Task<StaticFileModel?> GetStaticFile(string name);
     }
 }

@@ -13,6 +13,7 @@ namespace Server.Services.Database
         public DbSet<UserModel> Users => Set<UserModel>();
         public DbSet<MarketplaceModel> Marketplaces => Set<MarketplaceModel>();
         public DbSet<ChangeLogEntryModel> ChangelogEntries => Set<ChangeLogEntryModel>();
+        public DbSet<StaticFileModel> StaticFiles => Set<StaticFileModel>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
