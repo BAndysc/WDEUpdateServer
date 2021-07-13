@@ -1,6 +1,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Server.Services;
 
 namespace Server.Controllers
@@ -22,7 +23,11 @@ namespace Server.Controllers
             var physicalFile = await staticFileService.GetFilePath(filename);
             if (physicalFile == null)
                 return NotFound();
-            return new PhysicalFileResult(physicalFile.FullName, "application/octet-stream"){FileDownloadName = filename};
+            
+            return new FileStreamResult(System.IO.File.OpenRead(physicalFile.FullName), new MediaTypeHeaderValue("application/octet-stream"))
+            {
+                FileDownloadName = filename
+            };
         }
     }
 }
