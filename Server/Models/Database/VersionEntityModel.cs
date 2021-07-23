@@ -12,6 +12,7 @@ namespace Server.Models.Database
         public string Branch { get; set; } = "";
         public long Version { get; set; }
         public string TextVersion { get; set; } = "";
+        public string? UpdateTitle { get; set; }
         public DateTime ReleaseDate { get; set; }
         public List<ChangeLogEntryModel> Changes { get; set; } = null!;
 

@@ -47,7 +47,7 @@ namespace Server.Controllers
             return Ok(new CheckVersionResponse(latestVersion,  $"/Download/{downloadFile}/{request.Key}",
                 updates
                     .Where(u => u.Version <= latestVersion)
-                    .Select(version => new ChangeLogEntry(version.Version, version.TextVersion, version.ReleaseDate, null, version.Changes.Select(change => change.Change).ToArray())).ToArray()));
+                    .Select(version => new ChangeLogEntry(version.Version, version.TextVersion, version.ReleaseDate, version.UpdateTitle, version.Changes.Select(change => change.Change).ToArray())).ToArray()));
         }
     }
 }
