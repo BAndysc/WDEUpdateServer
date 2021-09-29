@@ -37,7 +37,7 @@ namespace Server.Controllers
 
             if (downloads.Count == 0)
             {
-                return Ok(new CheckVersionResponse(request.CurrentVersion, null));
+                return Ok(new CheckVersionResponse(request.CurrentVersion, null, null));
             }
 
             var latestVersion = downloads[0].version.Version;
@@ -45,7 +45,8 @@ namespace Server.Controllers
             var updates = await repository.GetChangelog(request.Marketplace, request.Branch, request.CurrentVersion, request.Platform);
             
             return Ok(new CheckVersionResponse(latestVersion,  $"/Download/{downloadFile}/{request.Key}",
-                updates
+                    downloads[0].file.HashMd5,
+                    updates
                     .Where(u => u.Version <= latestVersion)
                     .Select(version => new ChangeLogEntry(version.Version, version.TextVersion, version.ReleaseDate, version.UpdateTitle, version.Changes.Select(change => change.Change).ToArray())).ToArray()));
         }

@@ -1,10 +1,12 @@
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Server.Models.API;
 using Server.Models.Database;
 using Server.Services.Database;
+using SshNet.Security.Cryptography;
 
 namespace Server.Services
 {
@@ -22,10 +24,13 @@ namespace Server.Services
         public async Task<FileEntityModel> AddFile(UserModel uploader, Platforms platform, string marketplace, string branch, long version, IFormFile file, string[]? pathsToMakeExecutable)
         {
             var path = await fileStore.AddFile(platform, marketplace, branch, version, file, pathsToMakeExecutable);
-            
+            var physicalFile = fileStore.GetFile(path);
+            var hash = await CalculateMd5(physicalFile).ConfigureAwait(false);
+
             var model = new FileEntityModel()
             {
-                Path = path
+                Path = path,
+                HashMd5 = hash
             };
             
             await databaseRepository.InsertFile(uploader, model);
@@ -60,6 +65,16 @@ namespace Server.Services
         {
             await fileStore.RemoveFile(oldFile.Path);
             await databaseRepository.RemoveFile(oldFile);
+        }
+
+        public Task<string> CalculateMd5(FileInfo file)
+        {
+            return Task.Run(() =>
+            {
+                using var md5 = HashAlgorithm.Create("MD5")!;
+                using var stream = File.OpenRead(file.FullName);
+                return BitConverter.ToString(md5.ComputeHash(stream)).Replace("-","").ToLower();
+            });
         }
     }
 }

@@ -13,5 +13,6 @@ namespace Server.Services
         Task<FileInfo?> GetFile(Guid guid);
         Task<bool> FileExists(Guid guid);
         Task RemoveFile(FileEntityModel oldFile);
+        Task<string> CalculateMd5(FileInfo file);
     }
 }
