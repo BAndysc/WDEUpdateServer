@@ -32,8 +32,16 @@ namespace Server.Controllers
                 return BadRequest(ModelState);
             }
 
+            var platform = request.Platform;
+            if (platform == Platforms.Windows &&
+                request.Branch != "master" &&
+                (!request.OsMajorVersion.HasValue ||
+                 !request.OsMinorVersion.HasValue ||
+                 !request.OsPlatformId.HasValue))
+                platform = Platforms.Windows7; // no version <-- firstly provide win7 version
+
             var downloads = await repository.GetLatestVersion(request.Marketplace, request.Branch,
-                request.CurrentVersion, request.Platform);
+                request.CurrentVersion, platform);
 
             if (downloads.Count == 0)
             {
