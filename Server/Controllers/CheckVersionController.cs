@@ -34,7 +34,6 @@ namespace Server.Controllers
 
             var platform = request.Platform;
             if (platform == Platforms.Windows &&
-                request.Branch != "master" &&
                 (!request.OsMajorVersion.HasValue ||
                  !request.OsMinorVersion.HasValue ||
                  !request.OsPlatformId.HasValue))
