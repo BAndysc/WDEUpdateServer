@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Server.Models.API;
+using Server.Services;
 using Server.Services.Database;
 
 namespace Server.Controllers;
@@ -14,12 +15,12 @@ namespace Server.Controllers;
 public class CommentsController : ControllerBase
 {
     private readonly IDatabaseRepository repository;
+    private readonly ISpamDetector spamDetector;
 
-    private Dictionary<IPAddress, DateTime> spamDetector = new();
-
-    public CommentsController(IDatabaseRepository repository)
+    public CommentsController(IDatabaseRepository repository, ISpamDetector spamDetector)
     {
         this.repository = repository;
+        this.spamDetector = spamDetector;
     }
 
     [HttpPost("Add")]
@@ -34,16 +35,8 @@ public class CommentsController : ControllerBase
         if (ip == null)
             return StatusCode(403);
         
-        lock (spamDetector)
-        {
-            if (!spamDetector.TryGetValue(ip, out var lastComment) ||
-                (DateTime.Now - lastComment).TotalMinutes > 1)
-            {
-                spamDetector[ip] = DateTime.Now;
-            }
-            else
-                return StatusCode(401);
-        }
+        if (!spamDetector.TryMakeRequest(ip))
+            return StatusCode(401);
         
         await repository.AddComment(request.Username, request.Text, Request.Headers.UserAgent.ToString());
 
