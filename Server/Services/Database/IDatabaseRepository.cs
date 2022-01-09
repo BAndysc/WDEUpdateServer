@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Server.Models.API;
 using Server.Models.Database;
 
@@ -29,5 +31,6 @@ namespace Server.Services.Database
 
         Task<StaticFileModel?> GetStaticFile(string name);
         Task AddComment(string ip, string username, string text, string userAgent);
+        Task Log(HttpRequest request, string text);
     }
 }

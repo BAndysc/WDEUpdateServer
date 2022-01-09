@@ -15,6 +15,7 @@ namespace Server.Services.Database
         public DbSet<ChangeLogEntryModel> ChangelogEntries => Set<ChangeLogEntryModel>();
         public DbSet<StaticFileModel> StaticFiles => Set<StaticFileModel>();
         public DbSet<CommentModel> Comments => Set<CommentModel>();
+        public DbSet<LogModel> Logs => Set<LogModel>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

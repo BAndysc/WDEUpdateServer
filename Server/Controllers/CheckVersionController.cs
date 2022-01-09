@@ -29,8 +29,11 @@ namespace Server.Controllers
             if (!await requestVerifier.VerifyCheckVersionRequest(request, request.Key))
             {
                 ModelState.AddModelError("errors", $"The request couldn't be authorized.");
+                await repository.Log(Request, $"/CheckVersion   NOT AUTHORIZED ({request.Branch}, {request.Marketplace}, {request.Platform}, {request.CurrentVersion}, {request.Key})");
                 return BadRequest(ModelState);
             }
+
+            await repository.Log(Request, "/CheckVersion");
 
             var platform = request.Platform;
             if (platform == Platforms.Windows &&

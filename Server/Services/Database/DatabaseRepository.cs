@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Models.API;
@@ -195,6 +197,17 @@ namespace Server.Services.Database
         {
             await databaseContext.Comments.AddAsync(new CommentModel(Guid.NewGuid(), ip, username, text, userAgent, DateTime.Now));
             await databaseContext.SaveChangesAsync();
+        }
+
+        private async Task Log(IPAddress? ip, string method, string userAgent, string text)
+        {
+            await databaseContext.Logs.AddAsync(new LogModel(ip?.ToString(), method, text, userAgent));
+            await databaseContext.SaveChangesAsync();
+        }
+
+        public async Task Log(HttpRequest request, string text)
+        {
+            await Log(request.HttpContext.Connection.RemoteIpAddress, request.Method,request.Headers.UserAgent, text);
         }
     }
 }
