@@ -1,6 +1,6 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using MySql.EntityFrameworkCore.Metadata;
 
 namespace Server.Migrations
 {
@@ -13,7 +13,7 @@ namespace Server.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Change = table.Column<string>(type: "text", nullable: false),
                     VersionId = table.Column<byte[]>(type: "varbinary(16)", nullable: false)
                 },

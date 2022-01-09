@@ -1,6 +1,6 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using MySql.EntityFrameworkCore.Metadata;
 
 namespace Server.Migrations
 {
@@ -15,7 +15,7 @@ namespace Server.Migrations
                 nullable: false,
                 oldClrType: typeof(long),
                 oldType: "bigint")
-                .OldAnnotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn);
+                .OldAnnotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
             migrationBuilder.CreateTable(
                 name: "Comments",
@@ -43,7 +43,7 @@ namespace Server.Migrations
                 nullable: false,
                 oldClrType: typeof(long),
                 oldType: "bigint")
-                .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn);
+                .Annotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using MySql.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Server.Migrations
 {
@@ -20,7 +20,7 @@ namespace Server.Migrations
                 nullable: false,
                 oldClrType: typeof(long),
                 oldType: "bigint")
-                .OldAnnotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn);
+                .OldAnnotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -36,7 +36,7 @@ namespace Server.Migrations
                 nullable: false,
                 oldClrType: typeof(long),
                 oldType: "bigint")
-                .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn);
+                .Annotation("MySQL:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
         }
     }
 }
