@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace Server.Models.Database;
 
@@ -48,7 +49,7 @@ public class LogModel
                 Branch = value;
             else if (key == "run" && int.TryParse(value, out var intRun))
                 Run = intRun;
-            else if (key == "laststart" && DateTime.TryParse(value, out var date))
+            else if (key == "laststart" && DateTime.TryParseExact(value, "MM/dd/yyyy HH:mm", null, DateTimeStyles.AllowWhiteSpaces, out var date))
                 LastStart = date;
             else if (key == "core")
                 Core = value;
