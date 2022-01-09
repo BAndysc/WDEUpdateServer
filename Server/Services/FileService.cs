@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Server.Models.API;
 using Server.Models.Database;
 using Server.Services.Database;
-using SshNet.Security.Cryptography;
 
 namespace Server.Services
 {
