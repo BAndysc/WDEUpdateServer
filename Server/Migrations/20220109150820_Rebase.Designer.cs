@@ -6,18 +6,20 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Services.Database;
 
+#nullable disable
+
 namespace Server.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20220109123138_CommentsAdded")]
-    partial class CommentsAdded
+    [Migration("20220109150820_Rebase")]
+    partial class Rebase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 64)
-                .HasAnnotation("ProductVersion", "5.0.4");
+                .HasAnnotation("ProductVersion", "6.0.1")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Server.Models.Database.ChangeLogEntryModel", b =>
                 {
@@ -27,11 +29,10 @@ namespace Server.Migrations
 
                     b.Property<string>("Change")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
-                    b.Property<byte[]>("VersionId")
-                        .IsRequired()
-                        .HasColumnType("varbinary(16)");
+                    b.Property<Guid>("VersionId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -42,17 +43,27 @@ namespace Server.Migrations
 
             modelBuilder.Entity("Server.Models.Database.CommentModel", b =>
                 {
-                    b.Property<byte[]>("Key")
+                    b.Property<Guid>("Key")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("varbinary(16)");
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("Approved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Key");
 
@@ -61,22 +72,23 @@ namespace Server.Migrations
 
             modelBuilder.Entity("Server.Models.Database.FileEntityModel", b =>
                 {
-                    b.Property<byte[]>("Key")
+                    b.Property<Guid>("Key")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("varbinary(16)");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("HashMd5")
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Path")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("UploadDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("UploaderUser")
-                        .HasColumnType("varchar(767)");
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Key");
 
@@ -88,10 +100,10 @@ namespace Server.Migrations
             modelBuilder.Entity("Server.Models.Database.MarketplaceModel", b =>
                 {
                     b.Property<string>("Name")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Key")
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Name");
 
@@ -100,17 +112,17 @@ namespace Server.Migrations
 
             modelBuilder.Entity("Server.Models.Database.StaticFileModel", b =>
                 {
-                    b.Property<long>("Key")
+                    b.Property<uint>("Key")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int unsigned");
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Path")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Key");
 
@@ -120,11 +132,11 @@ namespace Server.Migrations
             modelBuilder.Entity("Server.Models.Database.UserModel", b =>
                 {
                     b.Property<string>("User")
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("KeyHash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.HasKey("User");
 
@@ -133,27 +145,27 @@ namespace Server.Migrations
 
             modelBuilder.Entity("Server.Models.Database.VersionEntityModel", b =>
                 {
-                    b.Property<byte[]>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("varbinary(16)");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Branch")
                         .IsRequired()
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Marketplace")
                         .IsRequired()
-                        .HasColumnType("varchar(767)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("ReleaseDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("TextVersion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UpdateTitle")
-                        .HasColumnType("text");
+                        .HasColumnType("longtext");
 
                     b.Property<long>("Version")
                         .HasColumnType("bigint");
@@ -171,20 +183,18 @@ namespace Server.Migrations
 
             modelBuilder.Entity("Server.Models.Database.VersionFilesModel", b =>
                 {
-                    b.Property<byte[]>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("varbinary(16)");
+                        .HasColumnType("char(36)");
 
-                    b.Property<byte[]>("FileKey")
-                        .IsRequired()
-                        .HasColumnType("varbinary(16)");
+                    b.Property<Guid>("FileKey")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("Platform")
                         .HasColumnType("int");
 
-                    b.Property<byte[]>("VersionId")
-                        .IsRequired()
-                        .HasColumnType("varbinary(16)");
+                    b.Property<Guid>("VersionId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -210,7 +220,9 @@ namespace Server.Migrations
                 {
                     b.HasOne("Server.Models.Database.UserModel", "Uploader")
                         .WithMany()
-                        .HasForeignKey("UploaderUser");
+                        .HasForeignKey("UploaderUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Uploader");
                 });
