@@ -71,7 +71,7 @@ namespace Server.Controllers
             
             var request = new UploadVersionRequest(new VersionKey(branch, marketplace, version), new Authentication(user, key), platform, versionName);
             
-            if (files.Count != 1 || !MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
+            if (files.Count != 1 || !MultipartRequestHelper.IsMultipartContentType(Request.ContentType!))
             {
                 ModelState.AddModelError("errors", $"The request couldn't be processed.");
                 return BadRequest(ModelState);
