@@ -58,13 +58,13 @@ public class LogModel
                 Marketplace = value;
             else if (key == "platform")
                 Platform = value;
-            else if (key == "OS")
+            else if (key == "os")
                 OS = value;
-            else if (key == "DBC")
+            else if (key == "dbc")
                 Dbc = value == "Yes";
-            else if (key == "DB")
+            else if (key == "db")
                 Db = value == "Yes";
-            else if (key == "SOAP")
+            else if (key == "soap")
                 Soap = value == "Yes";
         }
     }
