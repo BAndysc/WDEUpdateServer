@@ -18,9 +18,9 @@ public class SpamDetector : ISpamDetector
         lock (spamDetector)
         {
             if (!spamDetector.TryGetValue(address, out var lastComment) ||
-                (DateTime.Now - lastComment).TotalMinutes > 1)
+                (DateTime.UtcNow - lastComment).TotalMinutes > 1)
             {
-                spamDetector[address] = DateTime.Now;
+                spamDetector[address] = DateTime.UtcNow;
                 return true;
             }
             else

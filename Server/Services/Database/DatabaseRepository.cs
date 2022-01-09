@@ -133,7 +133,7 @@ namespace Server.Services.Database
             {
                 Branch = branch,
                 Marketplace = marketplace,
-                ReleaseDate = DateTime.Now,
+                ReleaseDate = DateTime.UtcNow,
                 Version = version,
                 TextVersion = textVersion
             };
@@ -147,7 +147,7 @@ namespace Server.Services.Database
         public async Task<bool> InsertFile(UserModel uploader, FileEntityModel model)
         {
             model.Uploader = uploader;
-            model.UploadDate = DateTime.Now;
+            model.UploadDate = DateTime.UtcNow;
             await databaseContext.Files.AddAsync(model);
 
             return await databaseContext.SaveChangesAsync() == 1;
@@ -195,7 +195,7 @@ namespace Server.Services.Database
 
         public async Task AddComment(string ip, string username, string text, string userAgent)
         {
-            await databaseContext.Comments.AddAsync(new CommentModel(Guid.NewGuid(), ip, username, text, userAgent, DateTime.Now));
+            await databaseContext.Comments.AddAsync(new CommentModel(Guid.NewGuid(), ip, username, text, userAgent, DateTime.UtcNow));
             await databaseContext.SaveChangesAsync();
         }
 

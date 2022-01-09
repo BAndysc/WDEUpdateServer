@@ -13,7 +13,7 @@ public class LogModel
         Method = method;
         Text = text;
         UserAgent = userAgent;
-        Date = DateTime.Now;
+        Date = DateTime.UtcNow;
 
         if (userAgent.StartsWith("WoWDatabaseEditor/"))
         {
