@@ -5,8 +5,9 @@ namespace Server.Models.Database;
 
 public class CommentModel
 {
-    public CommentModel(Guid key, string username, string text, string userAgent, DateTime date)
+    public CommentModel(Guid key, string ip, string username, string text, string userAgent, DateTime date)
     {
+        Ip = ip;
         Username = username;
         Text = text;
         Key = key;
@@ -19,6 +20,8 @@ public class CommentModel
     public Guid Key { get; set; }
     
     public string Username { get; set; }
+    
+    public string Ip { get; set; }
     
     public string UserAgent { get; set; }
     

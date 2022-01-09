@@ -38,7 +38,7 @@ public class CommentsController : ControllerBase
         if (!spamDetector.TryMakeRequest(ip))
             return StatusCode(401);
         
-        await repository.AddComment(request.Username, request.Text, Request.Headers.UserAgent.ToString());
+        await repository.AddComment(ip.ToString(), request.Username, request.Text, Request.Headers.UserAgent.ToString());
 
         return Ok();
     }

@@ -191,9 +191,9 @@ namespace Server.Services.Database
                 .FirstOrDefaultAsync();
         }
 
-        public async Task AddComment(string username, string text, string userAgent)
+        public async Task AddComment(string ip, string username, string text, string userAgent)
         {
-            await databaseContext.Comments.AddAsync(new CommentModel(Guid.NewGuid(), username, text, userAgent, DateTime.Now));
+            await databaseContext.Comments.AddAsync(new CommentModel(Guid.NewGuid(), ip, username, text, userAgent, DateTime.Now));
             await databaseContext.SaveChangesAsync();
         }
     }
