@@ -28,5 +28,6 @@ namespace Server.Services.Database
         Task AddChangelogEntry(VersionEntityModel version, string entry);
 
         Task<StaticFileModel?> GetStaticFile(string name);
+        Task AddComment(string username, string text);
     }
 }

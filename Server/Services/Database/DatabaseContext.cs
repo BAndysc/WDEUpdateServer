@@ -14,6 +14,7 @@ namespace Server.Services.Database
         public DbSet<MarketplaceModel> Marketplaces => Set<MarketplaceModel>();
         public DbSet<ChangeLogEntryModel> ChangelogEntries => Set<ChangeLogEntryModel>();
         public DbSet<StaticFileModel> StaticFiles => Set<StaticFileModel>();
+        public DbSet<CommentModel> Comments => Set<CommentModel>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

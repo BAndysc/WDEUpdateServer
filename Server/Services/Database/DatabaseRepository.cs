@@ -190,5 +190,11 @@ namespace Server.Services.Database
                 .Where(v => v.FileName == name)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task AddComment(string username, string text)
+        {
+            await databaseContext.Comments.AddAsync(new CommentModel(username, text));
+            await databaseContext.SaveChangesAsync();
+        }
     }
 }
