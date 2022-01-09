@@ -5,10 +5,13 @@ namespace Server.Models.Database;
 
 public class CommentModel
 {
-    public CommentModel(string username, string text)
+    public CommentModel(Guid key, string username, string text, string userAgent, DateTime date)
     {
         Username = username;
         Text = text;
+        Key = key;
+        Date = date;
+        UserAgent = userAgent;
     }
 
     [Key]
@@ -17,5 +20,11 @@ public class CommentModel
     
     public string Username { get; set; }
     
+    public string UserAgent { get; set; }
+    
     public string Text { get; set; }
+    
+    public DateTime Date { get; set; }
+    
+    public bool Approved { get; set; }
 }

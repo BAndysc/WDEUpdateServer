@@ -45,7 +45,7 @@ public class CommentsController : ControllerBase
                 return StatusCode(401);
         }
         
-        await repository.AddComment(request.Username, request.Text);
+        await repository.AddComment(request.Username, request.Text, Request.Headers.UserAgent.ToString());
 
         return Ok();
     }
