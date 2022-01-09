@@ -30,13 +30,12 @@ public class LogModel
 
         foreach (var part in parts)
         {
-            var keyValue = part.Split(':');
-
-            if (keyValue.Length != 2)
+            int index = part.IndexOf(':');
+            if (index < 0)
                 continue;
 
-            var key = keyValue[0].Trim();
-            var value = keyValue[1].Trim();
+            var key = part.Substring(0, index).Trim();
+            var value = part.Substring(index + 1).Trim();
             if (value.EndsWith(')'))
                 value = value.Substring(0, value.Length - 1);
 
@@ -49,7 +48,7 @@ public class LogModel
                 Branch = value;
             else if (key == "run" && int.TryParse(value, out var intRun))
                 Run = intRun;
-            else if (key == "laststart" && DateTime.TryParseExact(value, "MM/dd/yyyy HH:mm", null, DateTimeStyles.AllowWhiteSpaces, out var date))
+            else if (key == "laststart" && DateTime.TryParseExact(value, "MM/dd/yyyy HH:mm", null, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal, out var date))
                 LastStart = date;
             else if (key == "core")
                 Core = value;
