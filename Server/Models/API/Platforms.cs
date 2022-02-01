@@ -6,6 +6,7 @@ namespace Server.Models.API
         MacOs = 1,
         Linux = 2,
         WindowsWpf = 3,
-        Windows7 = 4
+        Windows7 = 4,
+        MacOsArm = 5,
     }
 }
